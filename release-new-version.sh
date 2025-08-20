@@ -30,7 +30,7 @@ fi
 
 # Bump version and commit
 uv version "$version"
-git add pyproject.toml
+git add pyproject.toml uv.lock
 git commit -m"Bump version to $version"
 # Tag and push the tag
 git tag "$version_tag"
