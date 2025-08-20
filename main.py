@@ -1,9 +1,11 @@
+from sys import stderr
 import requests
+from prometheus_client import start_http_server, Gauge
 
 
 class EventData:
-    def __init__(self, index, name, signups):
-        self.index = index
+    def __init__(self, id, name, signups):
+        self.id = id
         self.name = name
         self.signups = signups
 
@@ -49,10 +51,21 @@ def get_leaderboard_data() -> list[EventData]:
 
 
 def main():
-    leaderboard = get_leaderboard_data()
-    for event in leaderboard:
-        print(f"{event.name}       {event.signups}")
+    signups_gauge = Gauge(
+        "daydream_signups", "Number of signups per event", ["event_name", "event_id"]
+    )
+
+    while True:
+        try:
+            leaderboard = get_leaderboard_data()
+            for event in leaderboard:
+                signups_gauge.labels(event.name, event.id).set(event.signups)
+        except Exception as e:
+            print(f"Failed to fetch data: {e}", file=stderr)
 
 
 if __name__ == "__main__":
+    port = 9020
+    start_http_server(port)
+    print(f"Started metrics exporter: http://localhost:{port}/metrics")
     main()
