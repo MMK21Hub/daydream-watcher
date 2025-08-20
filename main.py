@@ -1,5 +1,6 @@
 from sys import stderr
 from time import sleep
+from traceback import format_exc
 import requests
 from prometheus_client import start_http_server, Gauge
 
@@ -69,9 +70,10 @@ def main():
             for event in leaderboard:
                 signups_gauge.labels(event.name, event.id).set(event.signups)
         except Exception as e:
+            # Exit the program if the first fetch fails
             if not has_had_success:
                 raise e
-            print(f"Failed to fetch data: {e}", file=stderr)
+            print(f"Failed to fetch data: {format_exc()}", file=stderr)
         finally:
             sleep(5)
 
