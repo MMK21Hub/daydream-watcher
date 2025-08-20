@@ -1,6 +1,6 @@
 [project]
 name = "daydream-watcher"
-version = "0.1.1"
+version = "0.1.2"
 description = "Prometheus metrics exporter for Daydream signups"
 readme = "README.md"
 requires-python = ">=3.9"
