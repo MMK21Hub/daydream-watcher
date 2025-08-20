@@ -66,7 +66,6 @@ def main():
         try:
             leaderboard = get_leaderboard_data()
             has_had_success = True
-            print(f"Successfully found data for {len(leaderboard)} events")
             for event in leaderboard:
                 signups_gauge.labels(event.name, event.id).set(event.signups)
         except Exception as e:
