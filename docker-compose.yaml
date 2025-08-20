@@ -1,0 +1,6 @@
+services:
+  daydream-watcher:
+    build: .
+    init: true
+    ports:
+      - 9020:9020
