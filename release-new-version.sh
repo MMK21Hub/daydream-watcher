@@ -36,6 +36,11 @@ git commit -m"Bump version to $version"
 git tag "$version_tag"
 git push origin "$version_tag"
 
+if [[ $? -ne 0 ]]; then
+  echo "Failed to push the tag :("
+  exit 4
+fi
+
 # Preparations for multi-arch builds
 # See https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 echo "Setting up multi-arch builds with Docker BuildKit"
