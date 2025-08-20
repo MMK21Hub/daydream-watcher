@@ -55,7 +55,7 @@ def get_leaderboard_data() -> list[EventData]:
 def main():
     port = 9020
     start_http_server(port)
-    print(f"Started metrics exporter: http://localhost:{port}/metrics")
+    print(f"Started metrics exporter: http://localhost:{port}/metrics", flush=True)
 
     has_had_success = False
     signups_gauge = Gauge(
@@ -73,12 +73,13 @@ def main():
             # Exit the program if the first fetch fails
             if not has_had_success:
                 raise e
-            print(f"Failed to fetch data: {format_exc()}", file=stderr)
+            print(f"Failed to fetch data: {format_exc()}", file=stderr, flush=True)
         finally:
             sleep(5)
 
 
 if __name__ == "__main__":
+    print("Starting Daydream Watcher...")
     try:
         main()
     except KeyboardInterrupt:
