@@ -4,4 +4,6 @@ version = "0.1.0"
 description = "Prometheus metrics exporter for Daydream signups"
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = []
+dependencies = [
+    "requests>=2.32.5",
+]
