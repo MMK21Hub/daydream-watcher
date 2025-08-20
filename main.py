@@ -51,6 +51,10 @@ def get_leaderboard_data() -> list[EventData]:
 
 
 def main():
+    port = 9020
+    start_http_server(port)
+    print(f"Started metrics exporter: http://localhost:{port}/metrics")
+
     signups_gauge = Gauge(
         "daydream_signups", "Number of signups per event", ["event_name", "event_id"]
     )
@@ -65,7 +69,7 @@ def main():
 
 
 if __name__ == "__main__":
-    port = 9020
-    start_http_server(port)
-    print(f"Started metrics exporter: http://localhost:{port}/metrics")
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
