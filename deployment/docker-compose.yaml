@@ -1,0 +1,7 @@
+services:
+  daydream-watcher:
+    image: mmk21/daydream-watcher:latest
+    init: true
+    restart: unless-stopped
+    ports:
+      - 9020:9020
