@@ -1,4 +1,5 @@
 from sys import stderr
+from time import sleep
 import requests
 from prometheus_client import start_http_server, Gauge
 
@@ -55,6 +56,7 @@ def main():
     start_http_server(port)
     print(f"Started metrics exporter: http://localhost:{port}/metrics")
 
+    has_had_success = False
     signups_gauge = Gauge(
         "daydream_signups", "Number of signups per event", ["event_name", "event_id"]
     )
@@ -62,10 +64,16 @@ def main():
     while True:
         try:
             leaderboard = get_leaderboard_data()
+            has_had_success = True
+            print(f"Successfully found data for {len(leaderboard)} events")
             for event in leaderboard:
                 signups_gauge.labels(event.name, event.id).set(event.signups)
         except Exception as e:
+            if not has_had_success:
+                raise e
             print(f"Failed to fetch data: {e}", file=stderr)
+        finally:
+            sleep(5)
 
 
 if __name__ == "__main__":
