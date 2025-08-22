@@ -39,3 +39,19 @@ scrape_configs:
 Start visualising the metrics by importing the example Grafana dashboard at [deployment/grafana-dashboard.json](deployment/grafana-dashboard.json) into your Grafana instance.
 
 The example dashboard matches the code used by the public demo as of 22 August 2025.
+
+## Maintainers: Releasing a new version
+
+Use the `release-new-version.sh` shell script, e.g.
+
+```bash
+./release-new-version.sh 0.2.1
+```
+
+It will
+
+1. Bump the version in `pyproject.toml`
+2. Create and push a Git tag for the new version
+3. Build and publish the Docker image to Docker Hub
+
+Then, manually check that the version bump commit is as expected, and `git push` it.
