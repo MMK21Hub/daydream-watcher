@@ -8,8 +8,9 @@ import requests
 from prometheus_client import start_http_server, Gauge
 
 TABLE_ID = "tblFkqWvQKUIXYjMK"
+AIRTABLE_APP_ID = "apppg7RHZv6feM66l"
 AIRTABLE_URL = (
-    "https://airtable.com/v0.3/application/apppg7RHZv6feM66l/readForSharedPages"
+    f"https://airtable.com/v0.3/application/{AIRTABLE_APP_ID}/readForSharedPages"
 )
 
 
@@ -30,7 +31,7 @@ def get_leaderboard_data(print_data: bool = False) -> list[EventData]:
         "User-Agent": f"Daydream Watcher (https://github.com/MMK21Hub/daydream-watcher) Python/{python_version()}",
         "Accept": "application/json",
         "x-time-zone": "Europe/London",
-        "x-airtable-application-id": "apppg7RHZv6feM66l",
+        "x-airtable-application-id": AIRTABLE_APP_ID,
         "X-Requested-With": "XMLHttpRequest",
     }
 
@@ -38,7 +39,6 @@ def get_leaderboard_data(print_data: bool = False) -> list[EventData]:
         "stringifiedObjectParams": json.dumps(
             {
                 "includeDataForPageId": "pagR7WnlKBl0YfLVQ",
-                "shouldIncludeSchemaChecksum": True,
                 "expectedPageLayoutSchemaVersion": 26,
                 "shouldPreloadQueries": True,
                 "shouldPreloadAllPossibleContainerElementQueries": True,
@@ -59,22 +59,22 @@ def get_leaderboard_data(print_data: bool = False) -> list[EventData]:
                     },
                     {
                         "modelClassName": "application",
-                        "modelIdSelector": "apppg7RHZv6feM66l",
+                        "modelIdSelector": AIRTABLE_APP_ID,
                         "action": "readForSharedPages",
                     },
                     {
                         "modelClassName": "application",
-                        "modelIdSelector": "apppg7RHZv6feM66l",
+                        "modelIdSelector": AIRTABLE_APP_ID,
                         "action": "readSignedAttachmentUrls",
                     },
                     {
                         "modelClassName": "application",
-                        "modelIdSelector": "apppg7RHZv6feM66l",
+                        "modelIdSelector": AIRTABLE_APP_ID,
                         "action": "readInitialDataForBlockInstallations",
                     },
                 ],
                 "shareId": "shrWJQJs5YsqWocLz",
-                "applicationId": "apppg7RHZv6feM66l",
+                "applicationId": AIRTABLE_APP_ID,
                 "generationNumber": 0,
                 "expires": "2025-09-11T00:00:00.000Z",
                 "signature": "fbd503372b322e269d96135020d7da5e11a61925589c5a36cab8d6b6e23130a2",
