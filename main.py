@@ -1,3 +1,4 @@
+import json
 from platform import python_version
 from sys import stderr
 from time import sleep
@@ -5,6 +6,16 @@ from traceback import format_exc
 from argparse import ArgumentParser
 import requests
 from prometheus_client import start_http_server, Gauge
+
+TABLE_ID = "tblFkqWvQKUIXYjMK"
+AIRTABLE_URL = (
+    "https://airtable.com/v0.3/application/apppg7RHZv6feM66l/readForSharedPages"
+)
+
+
+class Fields:
+    EVENT_NAME = "fld1JdoFOTTTo3RvE"
+    SIGNUP_COUNT = "fldlYIqhEy8Urh3MA"
 
 
 class EventData:
@@ -15,13 +26,6 @@ class EventData:
 
 
 def get_leaderboard_data(print_data: bool = False) -> list[EventData]:
-    URL = "https://airtable.com/v0.3/application/apppg7RHZv6feM66l/readForSharedPages?stringifiedObjectParams=%7B%22includeDataForPageId%22%3A%22pagR7WnlKBl0YfLVQ%22%2C%22shouldIncludeSchemaChecksum%22%3Atrue%2C%22expectedPageLayoutSchemaVersion%22%3A26%2C%22shouldPreloadQueries%22%3Atrue%2C%22shouldPreloadAllPossibleContainerElementQueries%22%3Atrue%2C%22urlSearch%22%3A%22%22%2C%22includeDataForExpandedRowPageFromQueryContainer%22%3Atrue%2C%22includeDataForAllReferencedExpandedRowPagesInLayout%22%3Atrue%2C%22navigationMode%22%3A%22view%22%7D&requestId=reqOQaQGDTDWbaKRI&accessPolicy=%7B%22allowedActions%22%3A%5B%7B%22modelClassName%22%3A%22page%22%2C%22modelIdSelector%22%3A%22pagR7WnlKBl0YfLVQ%22%2C%22action%22%3A%22read%22%7D%2C%7B%22modelClassName%22%3A%22application%22%2C%22modelIdSelector%22%3A%22apppg7RHZv6feM66l%22%2C%22action%22%3A%22readForSharedPages%22%7D%2C%7B%22modelClassName%22%3A%22application%22%2C%22modelIdSelector%22%3A%22apppg7RHZv6feM66l%22%2C%22action%22%3A%22readSignedAttachmentUrls%22%7D%2C%7B%22modelClassName%22%3A%22application%22%2C%22modelIdSelector%22%3A%22apppg7RHZv6feM66l%22%2C%22action%22%3A%22readInitialDataForBlockInstallations%22%7D%5D%2C%22shareId%22%3A%22shrWJQJs5YsqWocLz%22%2C%22applicationId%22%3A%22apppg7RHZv6feM66l%22%2C%22generationNumber%22%3A0%2C%22expires%22%3A%222025-09-11T00%3A00%3A00.000Z%22%2C%22signature%22%3A%22fbd503372b322e269d96135020d7da5e11a61925589c5a36cab8d6b6e23130a2%22%7D"
-    TABLE_ID = "tblFkqWvQKUIXYjMK"
-
-    class Fields:
-        EVENT_NAME = "fld1JdoFOTTTo3RvE"
-        SIGNUP_COUNT = "fldlYIqhEy8Urh3MA"
-
     headers = {
         "User-Agent": f"Daydream Watcher (https://github.com/MMK21Hub/daydream-watcher) Python/{python_version()}",
         "Accept": "application/json",
@@ -30,7 +34,55 @@ def get_leaderboard_data(print_data: bool = False) -> list[EventData]:
         "X-Requested-With": "XMLHttpRequest",
     }
 
-    response = requests.get(URL, headers=headers)
+    params = {
+        "stringifiedObjectParams": json.dumps(
+            {
+                "includeDataForPageId": "pagR7WnlKBl0YfLVQ",
+                "shouldIncludeSchemaChecksum": True,
+                "expectedPageLayoutSchemaVersion": 26,
+                "shouldPreloadQueries": True,
+                "shouldPreloadAllPossibleContainerElementQueries": True,
+                "urlSearch": "",
+                "includeDataForExpandedRowPageFromQueryContainer": True,
+                "includeDataForAllReferencedExpandedRowPagesInLayout": True,
+                "navigationMode": "view",
+            }
+        ),
+        "requestId": "reqOQaQGDTDWbaKRI",
+        "accessPolicy": json.dumps(
+            {
+                "allowedActions": [
+                    {
+                        "modelClassName": "page",
+                        "modelIdSelector": "pagR7WnlKBl0YfLVQ",
+                        "action": "read",
+                    },
+                    {
+                        "modelClassName": "application",
+                        "modelIdSelector": "apppg7RHZv6feM66l",
+                        "action": "readForSharedPages",
+                    },
+                    {
+                        "modelClassName": "application",
+                        "modelIdSelector": "apppg7RHZv6feM66l",
+                        "action": "readSignedAttachmentUrls",
+                    },
+                    {
+                        "modelClassName": "application",
+                        "modelIdSelector": "apppg7RHZv6feM66l",
+                        "action": "readInitialDataForBlockInstallations",
+                    },
+                ],
+                "shareId": "shrWJQJs5YsqWocLz",
+                "applicationId": "apppg7RHZv6feM66l",
+                "generationNumber": 0,
+                "expires": "2025-09-11T00:00:00.000Z",
+                "signature": "fbd503372b322e269d96135020d7da5e11a61925589c5a36cab8d6b6e23130a2",
+            }
+        ),
+    }
+
+    response = requests.get(AIRTABLE_URL, headers=headers, params=params)
     if print_data:
         print(response)
         print(response.text)
