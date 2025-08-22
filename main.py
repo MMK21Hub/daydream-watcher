@@ -1,3 +1,4 @@
+from platform import python_version
 from sys import stderr
 from time import sleep
 from traceback import format_exc
@@ -22,21 +23,11 @@ def get_leaderboard_data(print_data: bool = False) -> list[EventData]:
         SIGNUP_COUNT = "fldlYIqhEy8Urh3MA"
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
-        "Accept": "application/json, text/javascript, */*; q=0.01",
-        "Accept-Language": "en-US,en;q=0.5",
+        "User-Agent": f"Daydream Watcher (https://github.com/MMK21Hub/daydream-watcher) Python/{python_version()}",
+        "Accept": "application/json",
         "x-time-zone": "Europe/London",
-        "x-user-locale": "en",
-        "x-airtable-client-queue-time": "0",
         "x-airtable-application-id": "apppg7RHZv6feM66l",
-        "x-airtable-page-load-id": "pglA85iQJNGw1Y8U8",
-        "x-airtable-inter-service-client": "webClient",
-        "x-airtable-inter-service-client-code-version": "b1103f19d1076e5968d3d9645456bc3fb761658b",
-        "traceparent": "00-7766e0a6e355f528cb4d0c08590a5647-9aa0fbf10d2f99bc-01",
-        "tracestate": "",
         "X-Requested-With": "XMLHttpRequest",
-        "Pragma": "no-cache",
-        "Cache-Control": "no-cache",
     }
 
     response = requests.get(URL, headers=headers)
@@ -104,7 +95,6 @@ def main():
 
 
 if __name__ == "__main__":
-    print("Starting Daydream Watcher...")
     try:
         main()
     except KeyboardInterrupt:
