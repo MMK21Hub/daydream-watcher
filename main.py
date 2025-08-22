@@ -1,6 +1,7 @@
 from sys import stderr
 from time import sleep
 from traceback import format_exc
+from argparse import ArgumentParser
 import requests
 from prometheus_client import start_http_server, Gauge
 
@@ -12,7 +13,7 @@ class EventData:
         self.signups = signups
 
 
-def get_leaderboard_data() -> list[EventData]:
+def get_leaderboard_data(print_data: bool = False) -> list[EventData]:
     URL = "https://airtable.com/v0.3/application/apppg7RHZv6feM66l/readForSharedPages?stringifiedObjectParams=%7B%22includeDataForPageId%22%3A%22pagR7WnlKBl0YfLVQ%22%2C%22shouldIncludeSchemaChecksum%22%3Atrue%2C%22expectedPageLayoutSchemaVersion%22%3A26%2C%22shouldPreloadQueries%22%3Atrue%2C%22shouldPreloadAllPossibleContainerElementQueries%22%3Atrue%2C%22urlSearch%22%3A%22%22%2C%22includeDataForExpandedRowPageFromQueryContainer%22%3Atrue%2C%22includeDataForAllReferencedExpandedRowPagesInLayout%22%3Atrue%2C%22navigationMode%22%3A%22view%22%7D&requestId=reqOQaQGDTDWbaKRI&accessPolicy=%7B%22allowedActions%22%3A%5B%7B%22modelClassName%22%3A%22page%22%2C%22modelIdSelector%22%3A%22pagR7WnlKBl0YfLVQ%22%2C%22action%22%3A%22read%22%7D%2C%7B%22modelClassName%22%3A%22application%22%2C%22modelIdSelector%22%3A%22apppg7RHZv6feM66l%22%2C%22action%22%3A%22readForSharedPages%22%7D%2C%7B%22modelClassName%22%3A%22application%22%2C%22modelIdSelector%22%3A%22apppg7RHZv6feM66l%22%2C%22action%22%3A%22readSignedAttachmentUrls%22%7D%2C%7B%22modelClassName%22%3A%22application%22%2C%22modelIdSelector%22%3A%22apppg7RHZv6feM66l%22%2C%22action%22%3A%22readInitialDataForBlockInstallations%22%7D%5D%2C%22shareId%22%3A%22shrWJQJs5YsqWocLz%22%2C%22applicationId%22%3A%22apppg7RHZv6feM66l%22%2C%22generationNumber%22%3A0%2C%22expires%22%3A%222025-09-11T00%3A00%3A00.000Z%22%2C%22signature%22%3A%22fbd503372b322e269d96135020d7da5e11a61925589c5a36cab8d6b6e23130a2%22%7D"
     TABLE_ID = "tblFkqWvQKUIXYjMK"
 
@@ -39,6 +40,9 @@ def get_leaderboard_data() -> list[EventData]:
     }
 
     response = requests.get(URL, headers=headers)
+    if print_data:
+        print(response)
+        print(response.text)
     data = response.json()
     rows = data["data"]["preloadPageQueryResults"]["tableDataById"][TABLE_ID][
         "partialRowById"
@@ -53,9 +57,29 @@ def get_leaderboard_data() -> list[EventData]:
 
 
 def main():
-    port = 9020
-    start_http_server(port)
-    print(f"Started metrics exporter: http://localhost:{port}/metrics", flush=True)
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=9020,
+        help="the port to run the Prometheus exporter on",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        help="log whenever data is scraped (use -vv to print the whole response)",
+    )
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=5,
+        help="how often to fetch data from Airtable, in seconds",
+    )
+    args = parser.parse_args()
+
+    start_http_server(args.port)
+    print(f"Started metrics exporter: http://localhost:{args.port}/metrics", flush=True)
 
     has_had_success = False
     signups_gauge = Gauge(
@@ -64,8 +88,10 @@ def main():
 
     while True:
         try:
-            leaderboard = get_leaderboard_data()
+            leaderboard = get_leaderboard_data(print_data=args.verbose >= 2)
             has_had_success = True
+            if args.verbose:
+                print(f"Successfully fetched data for {len(leaderboard)} events")
             for event in leaderboard:
                 signups_gauge.labels(event.name, event.id).set(event.signups)
         except Exception as e:
@@ -74,7 +100,7 @@ def main():
                 raise e
             print(f"Failed to fetch data: {format_exc()}", file=stderr, flush=True)
         finally:
-            sleep(5)
+            sleep(args.interval)
 
 
 if __name__ == "__main__":
